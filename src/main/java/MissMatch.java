@@ -2,10 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import  java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.imageio.ImageIO;
 
 public class MissMatch extends JPanel {
 
@@ -13,6 +15,9 @@ public class MissMatch extends JPanel {
     private final String[] tileOrder = {"okrycie", "gora", "dol", "dodatki", "buty"};
     private int activeTile = 0;
     private final Map<String, Integer> selection = new HashMap<>();
+
+    private final BufferedImage bodyGrid = loadImage("assets/body/silhouette_grid.png");
+    private final BufferedImage bodyFull = loadImage("assets/body/silhouette_full.png");
 
     public MissMatch() {
         setFocusable(true);
@@ -34,8 +39,18 @@ public class MissMatch extends JPanel {
         g.setFont(new Font("SansSerif", Font.BOLD, 48));
         g.drawString("Miss Match", 60, 80);
 
-        int x = 620, tileW = 374, tileH = 80, gap = 11, startY = 90;
+        // --- obszar sylwetki (lewa czesc) ---
+        int bx = 30, by = 90, bw = 560, bh = 455;
+        g.setColor(new Color(0, 0, 0, 40));
+        g.drawRoundRect(bx, by, bw, bh, 12, 12);
+        g.setColor(new Color(120, 70, 150));
+        g.drawRoundRect(bx, by, bw, bh, 12, 12);
+        if (bodyGrid != null) {
+            drawScaleCentered(g, bodyGrid, bx + 16, by + 16, bw - 32, bh - 32);
+        }
 
+        // --- kafelki (prawa czesc) ---
+        int x = 620, tileW = 374, tileH = 80, gap = 11, startY = 90;
         for (int i = 0; i < tileOrder.length; i++) {
             int y = startY + i * (tileH + gap);
             String cat = tileOrder[i];
@@ -54,6 +69,24 @@ public class MissMatch extends JPanel {
             g.setColor(new Color(245, 235, 250));
             g.setFont(new Font("SansSerif", Font.BOLD, 22));
             g.drawString(currentItemName(cat), x + 14, y + 58);
+        }
+    }
+
+    private void drawScaleCentered(Graphics g, BufferedImage img, int areaX, int areaY, int areaW, int areaH) {
+        int iw = img.getWidth(), ih = img.getHeight();
+        double ratio = Math.min((double) areaW / iw, (double) areaH / ih);
+        int w = (int) (iw * ratio);
+        int h = (int) (ih * ratio);
+        int x = areaX + (areaW - w) / 2;
+        int y = areaY + (areaH - h) / 2;
+        g.drawImage(img, x, y, w, h, this);
+    }
+
+    private BufferedImage loadImage(String path) {
+        try {
+            return  ImageIO.read(new File(path));
+        } catch (Exception e) {
+            return null;
         }
     }
 
