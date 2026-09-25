@@ -19,6 +19,18 @@ public class MissMatch extends JPanel {
     private final BufferedImage bodyGrid = loadImage("assets/body/silhouette_grid.png");
     private final BufferedImage bodyFull = loadImage("assets/body/silhouette_full.png");
 
+    private final Map<String, BufferedImage> imgCache = new HashMap<>();
+
+    private record Layout(double x, double y, double scale) {}
+
+    private final Map<String, Layout> layout = new HashMap<>(Map.of(
+       "dodatki", new Layout(0.50, 0.72, 1.00),
+       "dol", new Layout(0.50, 0.66, 1.00),
+       "buty", new Layout(0.50, 0.93, 1.00),
+       "gora", new Layout(0.50, 0.40, 1.00),
+       "okrycie", new Layout(0.50, 0.42, 1.05)
+    ));
+
     public MissMatch() {
         setFocusable(true);
         addKeyListener(new KeyAdapter() {
@@ -31,10 +43,13 @@ public class MissMatch extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        super .paintComponent(g);
+        super.paintComponent(g);
+
+        // tlo
         g.setColor(new Color(28, 18, 46));
         g.fillRect(0, 0, getWidth(), getHeight());
 
+        //naglowek
         g.setColor(Color.WHITE);
         g.setFont(new Font("SansSerif", Font.BOLD, 48));
         g.drawString("Miss Match", 60, 80);
@@ -45,9 +60,11 @@ public class MissMatch extends JPanel {
         g.drawRoundRect(bx, by, bw, bh, 12, 12);
         g.setColor(new Color(120, 70, 150));
         g.drawRoundRect(bx, by, bw, bh, 12, 12);
+        Rectangle bodyBox = new Rectangle(bx + 16, by + 16, bw -32, bh -32);
         if (bodyGrid != null) {
-            drawScaleCentered(g, bodyGrid, bx + 16, by + 16, bw - 32, bh - 32);
+            bodyBox = drawScaleCentered(g, bodyGrid, bx + 16, by +16, bw - 32, bh - 32);
         }
+        drawClothes(g, bodyBox);
 
         // --- kafelki (prawa czesc) ---
         int x = 620, tileW = 374, tileH = 80, gap = 11, startY = 90;
@@ -72,7 +89,7 @@ public class MissMatch extends JPanel {
         }
     }
 
-    private void drawScaleCentered(Graphics g, BufferedImage img, int areaX, int areaY, int areaW, int areaH) {
+    private Rectangle drawScaleCentered(Graphics g, BufferedImage img, int areaX, int areaY, int areaW, int areaH) {
         int iw = img.getWidth(), ih = img.getHeight();
         double ratio = Math.min((double) areaW / iw, (double) areaH / ih);
         int w = (int) (iw * ratio);
@@ -80,6 +97,36 @@ public class MissMatch extends JPanel {
         int x = areaX + (areaW - w) / 2;
         int y = areaY + (areaH - h) / 2;
         g.drawImage(img, x, y, w, h, this);
+        return new Rectangle(x, y, w, h);
+    }
+
+    private String currentItemPath(String cat) {
+        List<String> items = wardrobe.getItems(cat);
+        int idx = selection.getOrDefault(cat, 0) % items.size();
+        return items.get(idx);
+    }
+
+    private BufferedImage getImg(String path) {
+        if (path == null) return null;
+        return imgCache.computeIfAbsent(path, this::loadImage);
+    }
+
+    private void drawClothes(Graphics g, Rectangle bodyBox) {
+        for (String cat : Wardrobe.LAYER_ORDER) {
+            BufferedImage img = getImg(currentItemPath(cat));
+            if (img == null) continue;
+            Layout lay = layout.get(cat);
+
+            int maxW = (int) (bodyBox.width * 0.9 * lay.scale());
+            int maxH = (int) (bodyBox.height * 0.9 * lay.scale());
+            int iw = img.getWidth(), ih = img.getHeight();
+            double ratio = Math.min((double) maxW / iw, (double) maxH / ih);
+            int w = (int) (iw * ratio), h = (int) (ih * ratio);
+
+            int cx = bodyBox.x + (int) (bodyBox.width * lay.x());
+            int cy = bodyBox.y + (int) (bodyBox.height * lay.y());
+            g.drawImage(img, cx - w / 2, cy - h / 2, w, h, this);
+        }
     }
 
     private BufferedImage loadImage(String path) {
