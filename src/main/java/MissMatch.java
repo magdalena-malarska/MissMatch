@@ -1,10 +1,16 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import  java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MissMatch extends JPanel {
 
     private final Wardrobe wardrobe = new Wardrobe();
     private final String[] tileOrder = {"okrycie", "gora", "dol", "dodatki", "buty"};
+    private int activeTile = 0;
+    private final Map<String, Integer> selection = new HashMap<>();
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -21,16 +27,21 @@ public class MissMatch extends JPanel {
         for (int i = 0; i < tileOrder.length; i++) {
             int y = startY + i * (tileH + gap);
             String cat = tileOrder[i];
+            boolean active = (i == activeTile);
 
-            g.setColor(new Color(44, 30, 66));
+            g.setColor(active ? new Color(120, 70, 150) : new Color(44, 30, 66));
             g.fillRoundRect(x, y, tileW, tileH, 10, 10);
 
-            g.setColor(new Color(80, 60, 100));
+            g.setColor(active ? new Color(255, 120, 200) : new Color(80, 60, 100));
             g.drawRoundRect(x, y, tileW, tileH, 10, 10);
 
-            g.setColor(new Color(170, 150, 190));
-            g.setFont(new Font("SansSerif", Font.BOLD, 18));
-            g.drawString(tileLabel(cat), x + 14, y + 28);
+            g.setColor(active ? new Color(120, 220, 255) : new Color(170, 150, 190));
+            g.setFont(new Font("SansSerif", Font.BOLD, 16));
+            g.drawString(tileLabel(cat), x + 14, y + 26);
+
+            g.setColor(new Color(245, 235, 250));
+            g.setFont(new Font("SansSerif", Font.BOLD, 22));
+            g.drawString(currentItemName(cat), x + 14, y + 58);
         }
     }
 
@@ -43,6 +54,17 @@ public class MissMatch extends JPanel {
             case "dodatki" -> "DODATKI";
             default -> cat.toUpperCase();
         };
+    }
+
+    private String currentItemName(String cat) {
+        List<String> items = wardrobe.getItems(cat);
+        int idx = selection.getOrDefault(cat, 0) % items.size();
+        String path = items.get(idx);
+        if (path == null) return "nie wybrano";
+        String file = new File(path).getName();
+        int dot = file.lastIndexOf('.');
+        if (dot > 0) file = file.substring(0, dot);
+        return file.replace('_', ' ');
     }
 
     public static void main(String[] args) {
