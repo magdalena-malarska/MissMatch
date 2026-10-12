@@ -20,15 +20,7 @@ public class MissMatch extends JPanel {
     private final BufferedImage bodyGrid = Images.load("assets/body/silhouette_grid.png");
     private final BufferedImage bodyFull = Images.load("assets/body/silhouette_full.png");
 
-    private record Layout(double x, double y, double scale) {}
-
-    private final Map<String, Layout> layout = new HashMap<>(Map.of(
-            "dodatki", new Layout(0.50, 0.72, 1.00),
-            "dol", new Layout(0.50, 0.66, 1.00),
-            "buty", new Layout(0.50, 0.93, 1.00),
-            "gora", new Layout(0.50, 0.40, 1.00),
-            "okrycie", new Layout(0.50, 0.42, 1.05)
-    ));
+    private final Calibration calibration = new Calibration();
 
     public MissMatch() {
         setFocusable(true);
@@ -104,7 +96,7 @@ public class MissMatch extends JPanel {
         for (String cat : Wardrobe.LAYER_ORDER) {
             BufferedImage img = images.get(currentItemPath(cat)); // cache z klasy Images
             if (img == null) continue;
-            Layout lay = layout.get(cat);
+            Calibration.Layout lay = calibration.get(cat);
 
             int maxW = (int) (bodyBox.width * 0.9 * lay.scale());
             int maxH = (int) (bodyBox.height * 0.9 * lay.scale());
