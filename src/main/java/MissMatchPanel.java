@@ -47,7 +47,7 @@ public class MissMatchPanel extends JPanel {
         // --- obszar sylwetki (lewa czesc) ---
         int bx = 30, by = 90, bw = 560, bh = 455;
         g.setColor(Style.BODY_BG);
-        g.drawRoundRect(bx, by, bw, bh, 12, 12);
+        g.fillRoundRect(bx, by, bw, bh, 12, 12);
         g.setColor(Style.BODY_BORDER);
         g.drawRoundRect(bx, by, bw, bh, 12, 12);
         Rectangle bodyBox = new Rectangle(bx + 16, by + 16, bw - 32, bh - 32);
@@ -109,14 +109,14 @@ public class MissMatchPanel extends JPanel {
     }
 
     private void handleKey(int key) {
-        if (key == KeyEvent.VK_UP) changeTitle(-1);
-        else if (key == KeyEvent.VK_DOWN) changeTitle(1);
+        if (key == KeyEvent.VK_UP) changeTile(-1);
+        else if (key == KeyEvent.VK_DOWN) changeTile(1);
         else if (key == KeyEvent.VK_LEFT) changeItem(-1);
         else if (key == KeyEvent.VK_RIGHT) changeItem(1);
         repaint();
     }
 
-    private void changeTitle(int delta) {
+    private void changeTile(int delta) {
         activeTile = (activeTile + delta + Style.TILE_ORDER.length) % Style.TILE_ORDER.length;
     }
 
@@ -128,9 +128,7 @@ public class MissMatchPanel extends JPanel {
     }
 
     private String currentItemName(String cat) {
-        List<String> items = wardrobe.getItems(cat);
-        int idx = selection.getOrDefault(cat, 0) % items.size();
-        String path = items.get(idx);
+        String path = currentItemPath(cat);
         if (path == null) return "nie wybrano";
         String file = new File(path).getName();
         int dot = file.lastIndexOf('.');
