@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MissMatch extends JPanel {
+public class MissMatchPanel extends JPanel {
 
     private final Wardrobe wardrobe = new Wardrobe();
     private int activeTile = 0;
@@ -21,7 +21,7 @@ public class MissMatch extends JPanel {
 
     private final Calibration calibration = new Calibration();
 
-    public MissMatch() {
+    public MissMatchPanel() {
         setFocusable(true);
         addKeyListener(new KeyAdapter() {
             @Override
@@ -136,17 +136,5 @@ public class MissMatch extends JPanel {
         int dot = file.lastIndexOf('.');
         if (dot > 0) file = file.substring(0, dot);
         return file.replace('_', ' ');
-    }
-
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Miss Match");
-        MissMatch panel = new MissMatch();
-        panel.setPreferredSize(new Dimension(1024, 600));
-        frame.add(panel);
-        frame.pack();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        panel.requestFocusInWindow();
     }
 }
