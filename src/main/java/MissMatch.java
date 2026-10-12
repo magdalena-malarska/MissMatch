@@ -11,7 +11,6 @@ import java.util.Map;
 public class MissMatch extends JPanel {
 
     private final Wardrobe wardrobe = new Wardrobe();
-    private final String[] tileOrder = {"okrycie", "gora", "dol", "dodatki", "buty"};
     private int activeTile = 0;
     private final Map<String, Integer> selection = new HashMap<>();
 
@@ -37,19 +36,19 @@ public class MissMatch extends JPanel {
         super.paintComponent(g);
 
         // tlo
-        g.setColor(new Color(28, 18, 46));
+        g.setColor(Style.BG);
         g.fillRect(0, 0, getWidth(), getHeight());
 
         // naglowek
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("SansSerif", Font.BOLD, 48));
+        g.setColor(Style.TITLE);
+        g.setFont(Style.FONT_TITLE);
         g.drawString("Miss Match", 60, 80);
 
         // --- obszar sylwetki (lewa czesc) ---
         int bx = 30, by = 90, bw = 560, bh = 455;
-        g.setColor(new Color(0, 0, 0, 40));
+        g.setColor(Style.BODY_BG);
         g.drawRoundRect(bx, by, bw, bh, 12, 12);
-        g.setColor(new Color(120, 70, 150));
+        g.setColor(Style.BODY_BORDER);
         g.drawRoundRect(bx, by, bw, bh, 12, 12);
         Rectangle bodyBox = new Rectangle(bx + 16, by + 16, bw - 32, bh - 32);
         if (bodyGrid != null) {
@@ -59,23 +58,23 @@ public class MissMatch extends JPanel {
 
         // --- kafelki (prawa czesc) ---
         int x = 620, tileW = 374, tileH = 80, gap = 11, startY = 90;
-        for (int i = 0; i < tileOrder.length; i++) {
+        for (int i = 0; i < Style.TILE_ORDER.length; i++) {
             int y = startY + i * (tileH + gap);
-            String cat = tileOrder[i];
+            String cat = Style.TILE_ORDER[i];
             boolean active = (i == activeTile);
 
-            g.setColor(active ? new Color(120, 70, 150) : new Color(44, 30, 66));
+            g.setColor(active ? Style.TILE_BG_ACTIVE : Style.TILE_BG);
             g.fillRoundRect(x, y, tileW, tileH, 10, 10);
 
-            g.setColor(active ? new Color(255, 120, 200) : new Color(80, 60, 100));
+            g.setColor(active ? Style.TILE_BORDER_ACTIVE : Style.TILE_BORDER);
             g.drawRoundRect(x, y, tileW, tileH, 10, 10);
 
-            g.setColor(active ? new Color(120, 220, 255) : new Color(170, 150, 190));
-            g.setFont(new Font("SansSerif", Font.BOLD, 16));
-            g.drawString(tileLabel(cat), x + 14, y + 26);
+            g.setColor(active ? Style.TILE_LABEL_ACTIVE : Style.TILE_LABEL);
+            g.setFont(Style.FONT_TILE_LABEL);
+            g.drawString(Style.tileLabel(cat), x + 14, y + 26);
 
-            g.setColor(new Color(245, 235, 250));
-            g.setFont(new Font("SansSerif", Font.BOLD, 22));
+            g.setColor(Style.TILE_ITEM);
+            g.setFont(Style.FONT_TILE_ITEM);
             g.drawString(currentItemName(cat), x + 14, y + 58);
         }
     }
@@ -118,25 +117,14 @@ public class MissMatch extends JPanel {
     }
 
     private void changeTitle(int delta) {
-        activeTile = (activeTile + delta + tileOrder.length) % tileOrder.length;
+        activeTile = (activeTile + delta + Style.TILE_ORDER.length) % Style.TILE_ORDER.length;
     }
 
     private void changeItem(int delta) {
-        String cat = tileOrder[activeTile];
+        String cat = Style.TILE_ORDER[activeTile];
         int n = wardrobe.getItems(cat).size();
         int cur = selection.getOrDefault(cat, 0);
         selection.put(cat, (cur + delta + n) % n);
-    }
-
-    private String tileLabel(String cat) {
-        return switch (cat) {
-            case "gora" -> "GÓRA";
-            case "dol" -> "DÓŁ";
-            case "okrycie" -> "OKRYCIE";
-            case "buty" -> "BUTY";
-            case "dodatki" -> "DODATKI";
-            default -> cat.toUpperCase();
-        };
     }
 
     private String currentItemName(String cat) {
