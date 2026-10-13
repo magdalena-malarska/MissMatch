@@ -78,6 +78,10 @@ public class Calibration {
         return layout.getOrDefault(category, FALLBACK);
     }
 
+    public boolean hasOwn(String category, String itemPath) {
+        return itemPath != null && layout.containsKey(key(category, itemPath));
+    }
+
     public void set(String category, String itemPath, Layout lay) {
         layout.put(key(category, itemPath), lay);
     }
