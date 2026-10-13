@@ -93,9 +93,10 @@ public class MissMatchPanel extends JPanel {
 
     private void drawClothes(Graphics g, Rectangle bodyBox) {
         for (String cat : Wardrobe.LAYER_ORDER) {
-            BufferedImage img = images.get(currentItemPath(cat)); // cache z klasy Images
+            String path = currentItemPath(cat);
+            BufferedImage img = images.get(path);
             if (img == null) continue;
-            Calibration.Layout lay = calibration.get(cat);
+            Calibration.Layout lay = calibration.get(cat, path);
 
             int maxW = (int) (bodyBox.width * 0.9 * lay.scale());
             int maxH = (int) (bodyBox.height * 0.9 * lay.scale());
